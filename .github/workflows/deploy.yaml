@@ -3,7 +3,7 @@ name: Build and Deploy Go Backend
 on:
   push:
     branches:
-      - main
+      - master
     # 只有当以下文件变化时才触发 (避免改个 README 也重新部署)
     paths:
       - '**.go'
