@@ -6,6 +6,7 @@ import (
 	"blog_platform/cmd/server/internal/repository"
 	"log"
 	"os"
+	"time"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -23,11 +24,12 @@ func main() {
 	if err != nil {
 		log.Fatal("无法连接数据库: ", err)
 	}
+	siteFoundingDate := time.Date(2025, 12, 10, 0, 0, 0, 0, time.Local)
 
 	db.AutoMigrate(&model.ArticleStat{})
 
 	articleRepo := repository.NewArticleRepo(db)
-	articleHandler := handler.NewArticleHandler(articleRepo)
+	articleHandler := handler.NewArticleHandler(articleRepo, siteFoundingDate)
 
 	r := gin.Default()
 
@@ -42,6 +44,7 @@ func main() {
 	api := r.Group("/api")
 	{
 		api.POST("/article/visit", articleHandler.RecordArticleVisit)
+		api.GET("/site/info", articleHandler.GetSiteInfo)
 	}
 
 	log.Println("服务启动在 :8080")
