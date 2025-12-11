@@ -8,7 +8,7 @@ import (
 
 type ArticleRepository interface {
 	IncreaseViewCount(path string) (int64, error)
-	GetSiteStats() (int64, int64, error)
+	GetSiteStats() (int64, error)
 }
 
 type articleRepo struct {
@@ -40,22 +40,15 @@ func (r *articleRepo) IncreaseViewCount(path string) (int64, error) {
 	return stat.ViewCount, err
 }
 
-func (r *articleRepo) GetSiteStats() (int64, int64, error) {
+func (r *articleRepo) GetSiteStats() (int64, error) {
 	var totalViews int64
-	var totalArticles int64
 
 	// 计算总阅读量 (SUM view_count)
 	// COALESCE 防止没有数据时返回 NULL 导致报错
 	err := r.db.Model(&model.ArticleStat{}).Select("COALESCE(SUM(view_count), 0)").Scan(&totalViews).Error
 	if err != nil {
-		return 0, 0, err
+		return 0, err
 	}
 
-	// 计算文章总数 (COUNT)
-	err = r.db.Model(&model.ArticleStat{}).Count(&totalArticles).Error
-	if err != nil {
-		return 0, 0, err
-	}
-
-	return totalViews, totalArticles, nil
+	return totalViews, nil
 }

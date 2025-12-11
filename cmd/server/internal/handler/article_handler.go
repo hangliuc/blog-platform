@@ -49,7 +49,7 @@ func (h *ArticleHandler) RecordArticleVisit(c *gin.Context) {
 // GetSiteInfo 处理 GET /api/site/info
 func (h *ArticleHandler) GetSiteInfo(c *gin.Context) {
 	// 从数据库查统计
-	totalViews, totalArticles, err := h.Repo.GetSiteStats()
+	totalViews, err := h.Repo.GetSiteStats()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "数据库查询失败"})
 		return
@@ -60,7 +60,6 @@ func (h *ArticleHandler) GetSiteInfo(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"total_views":    totalViews,
-		"total_articles": totalArticles,
 		"uptime_seconds": int64(uptime.Seconds()), // 返回秒数，前端处理成 "xx天xx小时" 更灵活
 		"start_time":     h.StartTime.Format(time.RFC3339),
 	})
