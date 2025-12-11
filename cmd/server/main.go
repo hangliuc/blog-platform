@@ -17,7 +17,7 @@ import (
 func main() {
 	dsn := os.Getenv("DSN")
 	if dsn == "" {
-		dsn = "root:GB_UXa>cX*h!K2@tcp(127.0.0.1:3306)/blog_db?charset=utf8mb4&parseTime=True&loc=Local"
+		log.Fatal("DSN 环境变量未设置")
 	}
 
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
@@ -26,7 +26,7 @@ func main() {
 	}
 	siteFoundingDate := time.Date(2025, 12, 10, 0, 0, 0, 0, time.Local)
 
-	db.AutoMigrate(&model.ArticleStat{})
+	db.AutoMigrate(&model.ArticleStat{}, &model.SiteStat{})
 
 	articleRepo := repository.NewArticleRepo(db)
 	articleHandler := handler.NewArticleHandler(articleRepo, siteFoundingDate)
@@ -35,7 +35,7 @@ func main() {
 
 	//  配置 CORS (允许跨域)
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"https://hangops.top", "http://localhost:1313"}, // 允许的域名
+		AllowOrigins:     []string{"https://hangops.top", "http://localhost:1313"}, 
 		AllowMethods:     []string{"POST", "GET", "OPTIONS"},
 		AllowHeaders:     []string{"Content-Type"},
 		AllowCredentials: true,
@@ -44,6 +44,7 @@ func main() {
 	api := r.Group("/api")
 	{
 		api.POST("/article/visit", articleHandler.RecordArticleVisit)
+		api.POST("/site/visit", articleHandler.RecordSiteVisit)
 		api.GET("/site/info", articleHandler.GetSiteInfo)
 	}
 

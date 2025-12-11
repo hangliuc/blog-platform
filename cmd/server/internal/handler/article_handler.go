@@ -39,28 +39,38 @@ func (h *ArticleHandler) RecordArticleVisit(c *gin.Context) {
 		return
 	}
 
-	// 返回结果
 	c.JSON(http.StatusOK, gin.H{
 		"path":  req.Path,
 		"views": count,
 	})
 }
 
+func (h *ArticleHandler) RecordSiteVisit(c *gin.Context) {
+	// 调用 Repo 增加全站计数
+	err := h.Repo.IncreaseSiteVisit()
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{"status": "ok"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"status": "ok"})
+
+}
+
 // GetSiteInfo 处理 GET /api/site/info
 func (h *ArticleHandler) GetSiteInfo(c *gin.Context) {
 	// 从数据库查统计
-	totalViews, err := h.Repo.GetSiteStats()
+	totalViews, siteTotalVisits, err := h.Repo.GetSiteStats()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "数据库查询失败"})
 		return
 	}
 
-	// 计算运行时间 (当前时间 - 启动时间)
 	uptime := time.Since(h.StartTime)
 
 	c.JSON(http.StatusOK, gin.H{
 		"total_views":    totalViews,
-		"uptime_seconds": int64(uptime.Seconds()), // 返回秒数，前端处理成 "xx天xx小时" 更灵活
+		"site_total_visits": siteTotalVisits,
+		"uptime_seconds": int64(uptime.Seconds()), 
 		"start_time":     h.StartTime.Format(time.RFC3339),
 	})
 }
