@@ -2,7 +2,7 @@ version: '4'
 
 services:
   waline:
-    image: lizheming/waline:latest
+    image: lizheming/waline:${WALINE_VERSION:-latest}
     container_name: waline-standalone
     restart: always
     ports:
@@ -12,14 +12,14 @@ services:
       - MYSQL_PORT=3306
       - MYSQL_DB=waline_db
       - MYSQL_USER=root
-      - MYSQL_PASSWORD=GB_UXa>cX*h!K2
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD:?MYSQL_PASSWORD must be set}
       - MYSQL_CHARSET=utf8mb4
       - MYSQL_SSL=false
       - TABLE_PREFIX=wl_
 
       - TZ=Asia/Shanghai
       - LANG=zh_CN.UTF-8
-      - JWT_SECRET=Standalone_Waline_Secret_2025
+      - JWT_SECRET=${WALINE_JWT_SECRET:?WALINE_JWT_SECRET must be set}
       # --- 通知配置 ---
       - SITE_NAME=Hangliuc
       - SITE_URL=https://hangops.top
@@ -27,7 +27,7 @@ services:
       # 163
       - SMTP_SERVICE=163
       - SMTP_USER=iliuhang@163.com
-      - SMTP_PASS=JKiFwCcnhxaXHUgP
+      - SMTP_PASS=${SMTP_PASS:?SMTP_PASS must be set}
       - SMTP_SECURE=true
       - AUTHOR_EMAIL=iliuhang@163.com
       - SENDER_EMAIL=iliuhang@163.com
@@ -39,4 +39,3 @@ networks:
   ext-blog-net:
     external: true
     name: blog-stats_blog-net
-

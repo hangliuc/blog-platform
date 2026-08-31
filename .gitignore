@@ -1,1 +1,4 @@
 mysql_data/
+.env
+.env.*
+!.env.example
